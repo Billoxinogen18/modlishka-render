@@ -9,7 +9,8 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Build using the original Makefile
+# Fix go.sum entries and build using the original Makefile
+RUN go mod tidy
 RUN make
 
 # Force new deployment
