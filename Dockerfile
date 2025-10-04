@@ -12,7 +12,7 @@ COPY . .
 # Fix go.sum entries and build using the original Makefile
 RUN go mod tidy
 RUN go mod download
-RUN make
+RUN make build
 
 # Force new deployment
 
