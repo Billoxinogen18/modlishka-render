@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/drk1wi/Modlishka/config"
-	"github.com/drk1wi/Modlishka/core"
-	"github.com/drk1wi/Modlishka/log"
-	"github.com/drk1wi/Modlishka/plugin"
-	"github.com/drk1wi/Modlishka/runtime"
+	"modlishka-render/config"
+	"modlishka-render/core"
+	"modlishka-render/log"
+	"modlishka-render/plugin"
+	"modlishka-render/runtime"
 )
 
 type Configuration struct{ config.Options }

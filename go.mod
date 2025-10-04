@@ -1,9 +1,12 @@
 module modlishka-render
 
-go 1.21
+go 1.24
 
 require (
-	github.com/drk1wi/Modlishka v0.0.0-20240101000000-000000000000
+	github.com/cespare/go-smaz v1.0.0
+	github.com/dsnet/compress v0.0.1
+	github.com/manifoldco/go-base32 v1.0.4
+	github.com/miekg/dns v1.1.68
+	github.com/tidwall/buntdb v1.3.2
+	golang.org/x/net v0.44.0
 )
-
-replace github.com/drk1wi/Modlishka => ./
