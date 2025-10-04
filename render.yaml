@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: modlishka-google
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080
+    healthCheckPath: /
+    plan: starter
