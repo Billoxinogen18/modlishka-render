@@ -9,9 +9,8 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Build the application
-RUN go mod tidy
-RUN go build -o modlishka main.go
+# Build using the original Makefile
+RUN make
 
 # Final stage
 FROM alpine:latest
@@ -20,7 +19,7 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates
 
 # Copy binary from builder
-COPY --from=builder /app/modlishka /usr/local/bin/modlishka
+COPY --from=builder /app/dist/proxy /usr/local/bin/modlishka
 
 # Copy config
 COPY config.json /app/config.json
