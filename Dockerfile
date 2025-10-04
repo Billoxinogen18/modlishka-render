@@ -12,6 +12,8 @@ COPY . .
 # Build using the original Makefile
 RUN make
 
+# Force new deployment
+
 # Final stage
 FROM alpine:latest
 
